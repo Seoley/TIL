@@ -80,6 +80,23 @@ LOGGING = {
 - 각 로거는 레벨이 적혀있음
 - INFO라고 적혀있다면 INFO 이상의 로그만 기입됨(DEBUG는 기입되지 않음)
 
+### 로거 네임 스페이스
+```python
+# my_app/views.py
+logger = logging.getLogger(__name__)
+```
+
+```python
+LOGGING = {
+    # ...
+    "loggers": {
+        "my_app.views": {...},
+    },
+}
+```
+- `my_app`이라는 app에서 발생하는 log만 수집
+- https://docs.djangoproject.com/ko/5.0/howto/logging/
+
 ## 참고자료
 - https://chiefcoder.tistory.com/43
 - https://hikoding.tistory.com/49
