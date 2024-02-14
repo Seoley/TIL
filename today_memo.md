@@ -7,73 +7,6 @@
 ### docstring 작성
 https://jh-bk.tistory.com/15
 
-### github 내 특정 파일 제외해서 pull하기
-`.gitignore` 외에 특정 브랜치에서 특정 파일을 pull하지 않기 위해서는 `sparse-checkout` 또는 `--skip-worktree` 등을 사용할 수 있습니다. 이 중에서 `--skip-worktree`는 특정 파일의 변경사항을 무시하도록 설정하는 방법입니다.
-
-아래는 특정 브랜치에서 특정 파일을 `pull`할 때 `--skip-worktree`를 사용하는 예시입니다.
-
-```bash
-# 원격 저장소의 변경사항을 가져올 때 특정 파일을 pull하지 않도록 설정
-git update-index --skip-worktree path/to/your/file
-
-# 변경사항을 가져옴
-git pull origin your-branch
-```
-
-그러나 이 방법은 로컬에서 해당 파일에 대한 변경사항을 추적하지 않도록 설정하는 것이며, 이 파일이 원격 저장소에서 변경된 경우에는 적용되지 않을 수 있습니다. 원격 저장소에서도 변경을 무시하려면 `.git/info/exclude`에 파일을 추가하거나, 해당 파일을 `.gitignore`에 추가하여 커밋하지 않도록 하는 것이 좋습니다.
-
-### Ludwig 중 오류 발생
-- 오류 내용
-```bash
-...
-...
-  File "C:\Users\dltjf\Developments\2. 업무 개발 코드\04 챗봇 서비스\env\lib\site-packages\yaml\scanner.py", line 116, in check_token
-    self.fetch_more_tokens()
-  File "C:\Users\dltjf\Developments\2. 업무 개발 코드\04 챗봇 서비스\env\lib\site-packages\yaml\scanner.py", line 255, in fetch_more_tokens
-    return self.fetch_plain()
-  File "C:\Users\dltjf\Developments\2. 업무 개발 코드\04 챗봇 서비스\env\lib\site-packages\yaml\scanner.py", line 679, in fetch_plain
-    self.tokens.append(self.scan_plain())
-  File "C:\Users\dltjf\Developments\2. 업무 개발 코드\04 챗봇 서비스\env\lib\site-packages\yaml\scanner.py", line 1290, in scan_plain
-    ch = self.peek(length)
-  File "C:\Users\dltjf\Developments\2. 업무 개발 코드\04 챗봇 서비스\env\lib\site-packages\yaml\reader.py", line 91, in peek
-    self.update(index+1)
-  File "C:\Users\dltjf\Developments\2. 업무 개발 코드\04 챗봇 서비스\env\lib\site-packages\yaml\reader.py", line 153, in update
-    self.update_raw()
-  File "C:\Users\dltjf\Developments\2. 업무 개발 코드\04 챗봇 서비스\env\lib\site-packages\yaml\reader.py", line 178, in update_raw
-    data = self.stream.read(size)
-UnicodeDecodeError: 'cp949' codec can't decode byte 0xe2 in position 5393: illegal multibyte sequence
-```
-- 발생 위치
-```bash
-  File "C:\Users\dltjf\Developments\2. 업무 개발 코드\04 챗봇 서비스\env\lib\site-packages\ludwig\schema\metadata\__init__.py", line 33, in <module>
-    ENCODER_METADATA = _load("encoders.yaml")
-```
-- 해결방안
-```python
-# open()에 'r',encoding='utf-8' 추가
-# yaml 유니코드 문제
-def _load(fname: str) -> Dict[str, Any]:
-    with open(os.path.join(_CONFIG_DIR, fname), 'r',encoding='utf-8') as f:
-        return _to_metadata(yaml.safe_load(f))
-```
-
-### Ludwig - GPU support 문제
-- 오류내용
-```bash
-C:\Users\dltjf\Developments\2. 업무 개발 코드\04 챗봇 서비스\env\lib\site-packages\bitsandbytes\cextension.py:34: UserWarning: The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
-  warn("The installed version of bitsandbytes was compiled without GPU support. "
-'NoneType' object has no attribute 'cadam32bit_grad_fp32'
-```
-- 액션
-    - env에서 cuda설정이 안되어서 발생하는 문제 같음
-    - anaconda를 사용해서 env를 재생성. anaconda는 별도의 독립적인 cuda를 사용할 수 있도록 지원해주므로, 이쪽을 사용하는 것이 좋다고 판단됐음.
-- 참고 블로그
-    - https://blog.lablup.com/en/posts/2023/07/28/bitsandbytes/
-
-### github 에서 독립적으로 동일한 파일 관리
-- 참고 블로그
-  - https://sasohan.github.io/2022/03/24/merge-strategies-using-git-attributes/
-  - 위의 이거 내가 딱 찾으려고 했던 그거임!!!
 
 ### Anaconda CUDA 설치
 - 발생 에러
@@ -139,3 +72,67 @@ RuntimeError:
   - ` libcudart.so`가 없어서 발생한 문제임을 확인. 그런데 `libcudart.so`는 mac/linux에서만 사용 가능함.
   - https://github.com/TimDettmers/bitsandbytes/issues/857
   - `pip install https://github.com/jllllll/bitsandbytes-windows-webui/releases/download/wheels/bitsandbytes-0.41.1-py3-none-win_amd64.whl`
+
+  # 231123
+  ## Python을 이용해 파일을 local에서 EC2로 업로드하는 법
+  - https://repost.aws/questions/QUAECsXArNQv2DcHMt0OOWTw/how-to-upload-file-from-local-machine-to-an-ec2-instance-planning-to-use-aws-sdk-via-python
+
+  # 231124
+  ## Docker 볼륨 생성 및 연동
+  - https://velog.io/@ckstn0777/%EB%8F%84%EC%BB%A4-%EB%B3%BC%EB%A5%A8
+  ```bash
+  # 볼륨 생성
+  docker 
+  docker volume create --name myvolume
+  docker volume ls
+  ```
+
+  ## Volume 마운트
+  - https://www.daleseo.com/docker-volumes-bind-mounts/
+
+  ## 코드 메모
+  ``` DockerFile
+  version: '3.5'
+  services:
+    chatbot_api:
+      build: 
+        context: .
+        dockerfile: ./API/Dockerfile
+      command: sh -c "cd API && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+      volumes: 
+        - alzam_ai:/childcare_chatbot
+      expose:
+        - "8000"
+    chatbot_mlops:
+      build: 
+        context: .
+        dockerfile: ./MLOps/Dockerfile
+      command: sh -c "cd MLOps && gunicorn config.wsgi:application --timeout 1200 --bind 0.0.0.0:8001"
+      volumes: 
+        - alzam_ai:/childcare_chatbot
+      expose:
+        - "8001"
+  volumes:
+    alzam_ai:
+  ```
+
+  ## docker 네트워크
+  - https://velog.io/@choidongkuen/%EC%84%9C%EB%B2%84-Docker-Network-%EC%97%90-%EB%8C%80%ED%95%B4
+
+  ## Volume을 사용하여 디렉토리 공유
+  - https://ko.linux-console.net/?p=7805
+  - 도커를 마운트해서 공유 가능. `마운트`의 개념을 확실히 이해해보자.
+
+  ## Docekr의 sqlite3 설치
+  ```DockerFile
+  # SQLite3 설치
+  RUN apt-get update && apt-get install -y sqlite3
+  ```
+
+  ## Docker에서 django 리로드
+
+  ## 설정파일 관리법(django)
+  - https://mingrammer.com/ways-to-manage-the-configuration-in-python/
+
+  ## Django의 main앱 명명 토론
+  - https://www.reddit.com/r/django/comments/anirli/discussion_what_to_call_the_main_app_in_your/
